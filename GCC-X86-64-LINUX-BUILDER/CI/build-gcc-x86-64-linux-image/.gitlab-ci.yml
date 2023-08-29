@@ -1,0 +1,14 @@
+.build-gcc-x86-64-linux-image-common:
+  extends: .pre-build-gcc-x86-64-linux-image-common
+  script:
+    - docker build . $DOCKER_CACHE_OPTS -t $GCC_X86_64_LINUX_IMAGE_NAME:$IMAGE_DEV_TAG -f $BASE_DOCKER_FILE_PATH
+    - docker push $GCC_X86_64_LINUX_IMAGE_NAME:$IMAGE_DEV_TAG
+
+build-gcc-x86-64-linux-image:
+  extends: .build-gcc-x86-64-linux-image-common
+
+build-gcc-x86-64-linux-image-no-cache:
+  extends: .build-gcc-x86-64-linux-image-common
+  variables:
+    DOCKER_CACHE_OPTS: "--no-cache"
+  when: manual

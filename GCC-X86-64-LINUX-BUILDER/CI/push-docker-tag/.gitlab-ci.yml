@@ -1,0 +1,10 @@
+push-build-gcc-x86-64-image-tag:
+  extends: .retag-docker
+  stage: push-docker-tag
+  needs: ["build-gcc-x86-64-linux-image"]
+  variables:
+    IMAGE_NAME: $GCC_X86_64_LINUX_IMAGE_NAME
+    PREVIOUS_TAG: $IMAGE_DEV_TAG
+    NEW_TAG: $CI_COMMIT_TAG
+  rules:
+    - if: $CI_COMMIT_TAG

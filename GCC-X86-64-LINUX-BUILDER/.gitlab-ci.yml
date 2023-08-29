@@ -1,0 +1,32 @@
+stages:
+  - build-gcc-x86-64-linux-image
+  - push-docker-tag
+
+variables:
+  BASE_DOCKER_FILE_PATH: "CI/build-gcc-x86-64-linux-image/gcc-x86-64-linux.dockerfile"
+  GCC_X86_64_LINUX_IMAGE_REPO: "sub.example.com:5050/code-process-docker-builders/gcc-x86-64-linux-builder"
+  GCC_X86_64_LINUX_IMAGE_NAME: "$GCC_X86_64_LINUX_IMAGE_REPO/gcc-x86-64-linux-builder"
+  IMAGE_DEV_TAG: "dev-${CI_PIPELINE_IID}-${CI_COMMIT_SHORT_SHA}"
+
+.pre-build-gcc-x86-64-linux-image-common:
+  stage: build-gcc-x86-64-linux-image
+  needs: []
+  tags:
+    - gcc-x86-64-linux-docker-job
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+.retag-docker:
+  extends: .build-gcc-x86-64-linux-image-common
+  script:
+    - docker pull ${IMAGE_NAME}:${PREVIOUS_TAG}
+    - docker tag ${IMAGE_NAME}:${PREVIOUS_TAG} ${IMAGE_NAME}:${NEW_TAG}
+    - docker push ${IMAGE_NAME}:${NEW_TAG}
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+
+include:
+  - local: CI/build-gcc-x86-64-linux-image/.gitlab-ci.yml
+  - local: CI/push-docker-tag/.gitlab-ci.yml
