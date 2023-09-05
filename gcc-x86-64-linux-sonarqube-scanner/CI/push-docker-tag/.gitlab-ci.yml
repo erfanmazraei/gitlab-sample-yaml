@@ -1,0 +1,14 @@
+push-sonarqube-scanner-gcc-x86-64-image-tag:
+  extends: .sonarqube-scanner-gcc-x86-64-image-pre-common
+  stage: push-docker-tag
+  needs: ["sonarqube-scanner-gcc-x86-64-image"]
+  variables:
+    IMAGE_NAME: $SONARQUBE_SCANNER_IMAGE_NAME
+    PREVIOUS_TAG: $IMAGE_DEV_TAG
+    NEW_TAG: $CI_COMMIT_TAG
+  script:
+    - docker pull ${IMAGE_NAME}:${PREVIOUS_TAG}
+    - docker tag ${IMAGE_NAME}:${PREVIOUS_TAG} ${IMAGE_NAME}:${NEW_TAG}
+    - docker push ${IMAGE_NAME}:${NEW_TAG}
+  rules:
+    - if: $CI_COMMIT_TAG

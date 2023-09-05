@@ -1,0 +1,29 @@
+stages:
+  - sonarqube-scanner-gcc-x86-64-image
+  - push-docker-tag
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+
+variables:
+  GCC_X86_64_LINUX_IMAGE_TAG: "0.1.0"
+  GCC_X86_64_LINUX_IMAGE_NAME: "git.example.com:5050/code-process-docker-builders/gcc-x86-64-linux-builder/gcc-x86-64-linux-builder-image:$GCC_X86_64_LINUX_IMAGE_TAG"
+  SONAR_SCANNER_CLI_DOWNLOAD_URL: "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip"
+  BUILD_WRAPPER_LINUX_DOWNLOAD_URL: "https://sonarqube.naadsecure.ir/static/cpp/build-wrapper-linux-x86.zip"
+  SONAR_QUBE_TOOLS_ABS_DIR: "opt/sonarqube-tools"
+  IMAGE_DEV_TAG: "dev-${CI_PIPELINE_IID}-${CI_COMMIT_SHORT_SHA}"
+  DOCKER_FILE_PATH: "CI/sonarqube-scanner-gcc-x86-64-image/sonarqube-scanner-gcc-x86-64-image.dockerfile"
+  SONARQUBE_SCANNER_IMAGE_NAME: "git.naadsecure.ir:5050/code-process-docker-builders/gcc-x86-64-linux-sonarqube-scanner/gcc-x86-64-sonarqube-scanner-image"
+
+.sonarqube-scanner-gcc-x86-64-image-pre-common:
+  stage: sonarqube-scanner-gcc-x86-64-image
+  needs: []
+  tags:
+    - builder-sonarqube-scanner-docker-job
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+include:
+  - local: CI/sonarqube-scanner-gcc-x86-64-image/.gitlab-ci.yml
+  - local: CI/push-docker-tag/.gitlab-ci.yml

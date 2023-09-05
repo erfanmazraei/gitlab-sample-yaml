@@ -1,0 +1,14 @@
+.sonarqube-scanner-gcc-x86-64-image-common:
+  extends: .sonarqube-scanner-gcc-x86-64-image-pre-common
+  script:
+    - docker build . $DOCKER_CACHE_OPTS -t $SONARQUBE_SCANNER_IMAGE_NAME:$IMAGE_DEV_TAG -f $DOCKER_FILE_PATH --build-arg GCC_X86_64_LINUX_IMAGE_NAME=$GCC_X86_64_LINUX_IMAGE_NAME --build-arg SONAR_QUBE_TOOLS_ABS_DIR=$SONAR_QUBE_TOOLS_ABS_DIR --build-arg SONAR_SCANNER_CLI_DOWNLOAD_URL=$SONAR_SCANNER_CLI_DOWNLOAD_URL --build-arg BUILD_WRAPPER_LINUX_DOWNLOAD_URL=$BUILD_WRAPPER_LINUX_DOWNLOAD_URL   
+    - docker push $SONARQUBE_SCANNER_IMAGE_NAME:$IMAGE_DEV_TAG
+
+sonarqube-scanner-gcc-x86-64-image:
+  extends: .sonarqube-scanner-gcc-x86-64-image-common
+    
+sonarqube-scanner-gcc-x86-64-image-no-cache:
+  extends: .sonarqube-scanner-gcc-x86-64-image-common
+  variables:
+    DOCKER_CACHE_OPTS: "--no-cache"
+  when: manual
